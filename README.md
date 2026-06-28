@@ -1,4 +1,4 @@
-# Repeat Playlist Player 🎵
+# Repeat Playlist Player 
 
 A simple music player built with Next.js that allows you to control how many times each song repeats before moving to the next track.
 
