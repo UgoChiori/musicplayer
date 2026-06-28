@@ -12,7 +12,7 @@ type Track = {
 
 export default function PlaylistPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
+  const [isShuffle, setIsShuffle] = useState(false);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentRepeat, setCurrentRepeat] = useState(0);
@@ -64,21 +64,49 @@ export default function PlaylistPlayer() {
     setCurrentRepeat(0);
   }
 
+
+  function getRandomIndex() {
+    if (tracks.length <= 1) return 0;
+    let randomIndex = currentIndex;
+    while (randomIndex === currentIndex) {
+      randomIndex = Math.floor(Math.random() * tracks.length);
+    }
+    return randomIndex;
+  }
+
   function nextTrack() {
-    const next = currentIndex + 1;
-    if (next < tracks.length) {
-      setCurrentIndex(next);
+    if (tracks.length === 0) return;
+
+    if (isShuffle) {
+      const randomIdx = getRandomIndex();
+      setCurrentIndex(randomIdx);
       setCurrentRepeat(0);
-      playTrack(next);
+      playTrack(randomIdx);
+    } else {
+      const next = currentIndex + 1;
+      if (next < tracks.length) {
+        setCurrentIndex(next);
+        setCurrentRepeat(0);
+        playTrack(next);
+      }
     }
   }
 
   function prevTrack() {
-    const prev = currentIndex - 1;
-    if (prev >= 0) {
-      setCurrentIndex(prev);
+    if (tracks.length === 0) return;
+
+    if (isShuffle) {
+      const randomIdx = getRandomIndex();
+      setCurrentIndex(randomIdx);
       setCurrentRepeat(0);
-      playTrack(prev);
+      playTrack(randomIdx);
+    } else {
+      const prev = currentIndex - 1;
+      if (prev >= 0) {
+        setCurrentIndex(prev);
+        setCurrentRepeat(0);
+        playTrack(prev);
+      }
     }
   }
 
@@ -92,14 +120,20 @@ export default function PlaylistPlayer() {
       return;
     }
 
-    const next = currentIndex + 1;
-
-    if (next < tracks.length) {
-      setCurrentIndex(next);
+    if (isShuffle) {
+      const randomIdx = getRandomIndex();
+      setCurrentIndex(randomIdx);
       setCurrentRepeat(0);
-      playTrack(next);
+      playTrack(randomIdx);
     } else {
-      setIsPlaying(false);
+      const next = currentIndex + 1;
+      if (next < tracks.length) {
+        setCurrentIndex(next);
+        setCurrentRepeat(0);
+        playTrack(next);
+      } else {
+        setIsPlaying(false);
+      }
     }
   }
 
@@ -144,6 +178,7 @@ export default function PlaylistPlayer() {
       />
 
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+     
         <div className="w-full md:w-1/3 bg-white md:border-r border-b md:border-b-0 border-gray-200 p-4 flex flex-col h-64 md:h-auto overflow-hidden">
           <h2 className="text-base md:text-lg font-bold text-gray-800 shrink-0">
             Playlist
@@ -166,7 +201,12 @@ export default function PlaylistPlayer() {
               tracks.map((t, i) => (
                 <div
                   key={i}
-                  className={`p-3 rounded-lg border transition-all ${
+                  onClick={() => {
+                    setCurrentIndex(i);
+                    setCurrentRepeat(0);
+                    playTrack(i);
+                  }}
+                  className={`p-3 rounded-lg border transition-all cursor-pointer ${
                     i === currentIndex
                       ? "bg-green-50 border-green-300 shadow-sm"
                       : "bg-gray-50 border-green-200 hover:bg-green-100"
@@ -177,7 +217,10 @@ export default function PlaylistPlayer() {
                       {t.name}
                     </span>
 
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div 
+                      className="flex items-center gap-1 shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <span className="text-xxs uppercase text-gray-400 font-semibold tracking-wider hidden sm:inline"></span>
                       <input
                         title="Set repeat count"
@@ -197,6 +240,7 @@ export default function PlaylistPlayer() {
           </div>
         </div>
 
+      
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-gray-50 min-h-[350px]">
           <div className="max-w-md w-full space-y-6">
             <div>
@@ -210,6 +254,7 @@ export default function PlaylistPlayer() {
               </p>
             </div>
 
+         
             <div className="w-full max-w-xs mx-auto">
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden shadow-inner">
                 <div
@@ -219,11 +264,30 @@ export default function PlaylistPlayer() {
               </div>
             </div>
 
+      
             <div className="flex items-center justify-center gap-6 pt-2">
+           
+              <button
+                type="button"
+                onClick={() => setIsShuffle(!isShuffle)}
+                disabled={tracks.length === 0}
+                className={`p-3 transition-all active:scale-90 cursor-pointer ${
+                  isShuffle 
+                    ? "text-green-600 drop-shadow-[0_0_4px_rgba(34,197,94,0.4)] font-bold" 
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
+                title={isShuffle ? "Turn Shuffle Off" : "Turn Shuffle On"}
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.38 10.17l-1.42 1.41 3.17 3.17L14.5 20H20v-5.5l-2.04 2.04-3.08-3.07z"/>
+                </svg>
+              </button>
+
+              
               <button
                 type="button"
                 onClick={prevTrack}
-                disabled={currentIndex === 0 || tracks.length === 0}
+                disabled={(!isShuffle && currentIndex === 0) || tracks.length === 0}
                 className="p-3 text-gray-600 hover:text-green-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-all active:scale-90 cursor-pointer"
                 title="Previous Track"
               >
@@ -236,6 +300,7 @@ export default function PlaylistPlayer() {
                 </svg>
               </button>
 
+             
               <button
                 type="button"
                 onClick={stopTrack}
@@ -252,6 +317,7 @@ export default function PlaylistPlayer() {
                 </svg>
               </button>
 
+            
               <button
                 type="button"
                 onClick={togglePlay}
@@ -278,11 +344,12 @@ export default function PlaylistPlayer() {
                 )}
               </button>
 
+            
               <button
                 type="button"
                 onClick={nextTrack}
                 disabled={
-                  currentIndex === tracks.length - 1 || tracks.length === 0
+                  (!isShuffle && currentIndex === tracks.length - 1) || tracks.length === 0
                 }
                 className="p-3 text-gray-600 hover:text-green-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-all active:scale-90 cursor-pointer"
                 title="Next Track"
