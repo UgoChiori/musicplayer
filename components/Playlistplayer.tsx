@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { fetchTracks } from "@/lib/jamendo";
 
 type Track = {
-  file: File;
+  file: File | null;
   name: string;
   repeats: number;
   url: string;
@@ -19,20 +20,20 @@ export default function PlaylistPlayer() {
   const [progress, setProgress] = useState(0);
 
   // Load files
-  function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files || []);
+  // function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+  //   const files = Array.from(e.target.files || []);
 
-    const newTracks: Track[] = files.map((file) => ({
-      file,
-      name: file.name,
-      repeats: 1,
-      url: URL.createObjectURL(file),
-    }));
+  //   const newTracks: Track[] = files.map((file) => ({
+  //     file,
+  //     name: file.name,
+  //     repeats: 1,
+  //     url: URL.createObjectURL(file),
+  //   }));
 
-    setTracks(newTracks);
-    setCurrentIndex(0);
-    setCurrentRepeat(0);
-  }
+  //   setTracks(newTracks);
+  //   setCurrentIndex(0);
+  //   setCurrentRepeat(0);
+  // }
 
   // Update repeat count
   function updateRepeat(index: number, value: number) {
@@ -43,13 +44,25 @@ export default function PlaylistPlayer() {
 
   // Play a track
   function playTrack(index: number) {
-    const track = tracks[index];
-    if (!track || !audioRef.current) return;
+  console.log("PLAY CLICKED", index);
+  console.log("TRACKS", tracks);
 
-    audioRef.current.src = track.url;
-    audioRef.current.play();
-    setIsPlaying(true);
-  }
+  const track = tracks[index];
+  console.log("CURRENT TRACK", track);
+
+  if (!track || !audioRef.current) return;
+
+  audioRef.current.src = track.url;
+  audioRef.current.play();
+}
+  // function playTrack(index: number) {
+  //   const track = tracks[index];
+  //   if (!track || !audioRef.current) return;
+
+  //   audioRef.current.src = track.url;
+  //   audioRef.current.play();
+  //   setIsPlaying(true);
+  // }
 
   // Toggle play/pause
   function togglePlay() {
@@ -95,6 +108,29 @@ export default function PlaylistPlayer() {
 
     setProgress(percent || 0);
   }
+useEffect(() => {
+  async function load() {
+    console.log("LOADING JAMENDO...");
+
+    const data = await fetchTracks();
+
+    console.log("JAMENDO RESPONSE:", data);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formatted = data.map((t: any) => ({
+      file: null,
+      name: `${t.name} - ${t.artist}`,
+      repeats: 1,
+      url: t.url,
+    }));
+
+    console.log("FORMATTED:", formatted);
+
+    setTracks(formatted);
+  }
+
+  load();
+}, []);
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
@@ -116,13 +152,13 @@ export default function PlaylistPlayer() {
 
           <h2 className="text-lg font-bold">Playlist</h2>
 
-          <input
+          {/* <input
           title="Upload songs"
             type="file"
             multiple
             onChange={handleFiles}
             className="border border-gray-300 p-2 rounded w-full"
-          />
+          /> */}
 
           <div className="space-y-2 mt-4">
 
