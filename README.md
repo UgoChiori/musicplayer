@@ -1,37 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Repeat Playlist Player 
 
-## Getting Started
+A simple music player built with Next.js that allows you to control how many times each song repeats before moving to the next track.
 
-First, run the development server:
+This project was built as a personal experiment to explore programmable playback behavior using the HTML Audio API.
+
+---
+
+##  Features
+
+* Upload local audio files
+* Set custom repeat count for each song
+* Automatic playback queue
+* Auto-repeat per track
+* Smooth transition to next song
+* Simple and lightweight (no backend required)
+
+---
+
+##  Concept
+
+Unlike traditional music players that simply play a queue from start to finish, this player introduces the idea of **repeat-aware playback**.
+
+Each track has a defined number of plays:
+
+```
+Song A → plays 5 times
+Song B → plays 2 times
+Song C → plays 1 time
+```
+
+The player handles:
+
+* Repeating a song until its count is exhausted
+* Moving automatically to the next song
+* Maintaining playback state in the browser
+
+---
+
+##  Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/repeat-playlist-player.git
+cd repeat-playlist-player
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 4. Open the app
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Visit:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+http://localhost:3000
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+##  Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* Next.js (App Router)
+* React
+* TypeScript
+* HTML Audio API
+* Tailwind CSS
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+##  How It Works
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. User uploads audio files
+2. Each file is added to a playlist with a repeat count
+3. On playback:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# musicplayer
+   * The current song plays
+   * When it ends, the repeat counter is checked
+   * If repeats remain → song replays
+   * If finished → move to next track
+
+---
+
+##  Future Improvements
+
+* Drag-and-drop playlist ordering
+* Progress bar and time tracking
+* “Repeat for duration” mode (e.g. 10 minutes)
+* Shuffle after repeat cycles
+* Persistent playlists (localStorage / cloud sync)
+* Better UI/UX (Spotify-style interface)
+* Mobile support
+
+---
+
+##  Purpose
+
+This project is not meant to replace existing music players, but to explore a more flexible way of thinking about playback logic and user control.
+
+It was built as a learning project and a playground for experimenting with React state management and audio handling.
+
+---
+
+##  License
+
+MIT — feel free to use, modify, and experiment.
